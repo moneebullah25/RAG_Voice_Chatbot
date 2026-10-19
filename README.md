@@ -2,6 +2,10 @@
 
 This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot that allows users to interact with a large language model (Mistral-7B) using voice input and receive voice responses. The chatbot retrieves relevant information from uploaded PDF documents to provide context-aware answers. Here’s a short video demonstrating the UI - https://www.youtube.com/watch?v=DAJgfzRsfBs
 
+![Notebook output from a real Colab run of RAG_Voice_Chatbot.ipynb: library versions, CUDA device and Gradio launch](docs/images/demo.png)
+
+*Captured output of the `RAG_Voice_Chatbot.ipynb` cells from a Colab GPU run (the app itself needs a GPU and a 7B model, so it was not re-run locally).*
+
 ## Features
 
 - Upload multiple PDF files to create a knowledge base
@@ -28,7 +32,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 1. Clone the repository:
 
    ```
-   git clone https://github.com/vardhanam/RAG_Voice_Chatbot.git
+   git clone https://github.com/moneebullah25/RAG_Voice_Chatbot.git
    ```
 
 2. Install the required dependencies:
@@ -36,6 +40,10 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
    ```
    pip install -r requirements.txt
    ```
+
+   Note: `requirements.txt` lists only the direct dependencies. The full Colab environment freeze (includes CUDA-only wheels such as `cudf-cu12`) is kept in `requirements-colab-freeze.txt` and installs reliably only on a Colab-like Linux/CUDA machine.
+
+3. The Mistral model is gated on Hugging Face. Replace `YOUR_HF_TOKEN` in the notebook `login(...)` cell with your own token (never commit it).
 
 ## Usage
 
@@ -52,13 +60,13 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 1. Start the Flask server:
 
    ```
-   python flask_app.py
+   python flask_app.py          # set FLASK_DEBUG=1 to enable the debugger (local use only)
    ```
 
 2. The API provides the following endpoints:
 
    - `/upload_pdfs` (POST): Upload PDF files to create a knowledge base.
-     - Request body: JSON object with the key `file_paths` containing an array of file paths.
+     - Request body: JSON object with the key `file_paths` containing an array of file paths, relative to the upload directory (`UPLOAD_DIR`, default `./uploads`). Paths outside it are rejected with 400.
      - Response: JSON object with a success message or an error message.
      - Example cURL command:
        ```
@@ -69,7 +77,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
        ```
 
    - `/process_audio` (POST): Process audio input, generate a response, and return the response as audio.
-     - Request body: JSON object with the keys `audio_path` (path to the audio file) and `output_filename` (desired filename for the generated audio response).
+     - Request body: JSON object with the keys `audio_path` (path to the audio file, relative to `UPLOAD_DIR`; paths outside it are rejected with 400) and `output_filename` (desired filename for the generated audio response).
      - Response: JSON object with the keys `transcription` (transcribed text), `response_text` (generated response), and `audio_output` (path to the generated audio file).
      - Example cURL command:
        ```
@@ -103,8 +111,14 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 
 ## Notes
 
+- The Flask endpoints read arbitrary server-side file paths you send them; run the API only on localhost/trusted networks.
+
 - The chatbot uses the Mistral-7B language model, which requires significant computational resources. Ensure you have sufficient memory and a compatible GPU.
 - The chatbot relies on the uploaded PDF files for providing context-aware responses. Make sure to upload relevant documents before asking questions.
 - The audio transcription and generation may take some time depending on the length of the input and the complexity of the response.
 
 Feel free to explore and interact with the Voice RAG Chatbot using either the Jupyter Notebook or the Flask API to experience voice-based conversational AI with retrieval-augmented generation capabilities!
+
+## License
+
+MIT, see [LICENSE](LICENSE).
