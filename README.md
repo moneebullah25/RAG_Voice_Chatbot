@@ -118,3 +118,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 - The audio transcription and generation may take some time depending on the length of the input and the complexity of the response.
 
 Feel free to explore and interact with the Voice RAG Chatbot using either the Jupyter Notebook or the Flask API to experience voice-based conversational AI with retrieval-augmented generation capabilities!
+
+## License
+
+MIT, see [LICENSE](LICENSE).
