@@ -151,6 +151,7 @@ def generate_and_play_audio(text, filename):
 
 
 from flask import Flask, request, jsonify
+from safe_paths import resolve_in_upload_dir
 
 app = Flask(__name__)
 
@@ -164,7 +165,11 @@ def upload_pdfs():
     if not file_paths or not isinstance(file_paths, list):
         return jsonify({'error': 'No file paths provided or file paths is not a list'}), 400
 
-    # Assuming add_pdfs_to_vectorstore is a function that processes the list of file paths
+    try:
+        file_paths = [resolve_in_upload_dir(p) for p in file_paths]
+    except ValueError:
+        return jsonify({'error': 'file_paths must be inside the upload directory'}), 400
+
     try:
         result = add_pdfs_to_vectorstore(file_paths)
         return jsonify({'message': result}), 200
@@ -188,7 +193,11 @@ def process_audio():
     if not output_filename:
         return jsonify({'error': 'No output filename provided'}), 400
 
-    # Assuming the audio file exists at the given path and is accessible by the server
+    try:
+        audio_path = resolve_in_upload_dir(audio_path)
+    except ValueError:
+        return jsonify({'error': 'audio_path must be inside the upload directory'}), 400
+
     try:
         transcription = transcribe(audio_path)
         response_text = answer_query(transcription)
