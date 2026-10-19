@@ -41,7 +41,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
    pip install -r requirements.txt
    ```
 
-   Note: `requirements.txt` is a full Colab environment freeze (it includes CUDA-only wheels such as `cudf-cu12`), so it installs reliably only on a Colab-like Linux/CUDA machine.
+   Note: `requirements.txt` lists only the direct dependencies. The full Colab environment freeze (includes CUDA-only wheels such as `cudf-cu12`) is kept in `requirements-colab-freeze.txt` and installs reliably only on a Colab-like Linux/CUDA machine.
 
 3. The Mistral model is gated on Hugging Face. Replace `YOUR_HF_TOKEN` in the notebook `login(...)` cell with your own token (never commit it).
 
@@ -66,7 +66,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 2. The API provides the following endpoints:
 
    - `/upload_pdfs` (POST): Upload PDF files to create a knowledge base.
-     - Request body: JSON object with the key `file_paths` containing an array of file paths.
+     - Request body: JSON object with the key `file_paths` containing an array of file paths, relative to the upload directory (`UPLOAD_DIR`, default `./uploads`). Paths outside it are rejected with 400.
      - Response: JSON object with a success message or an error message.
      - Example cURL command:
        ```
@@ -77,7 +77,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
        ```
 
    - `/process_audio` (POST): Process audio input, generate a response, and return the response as audio.
-     - Request body: JSON object with the keys `audio_path` (path to the audio file) and `output_filename` (desired filename for the generated audio response).
+     - Request body: JSON object with the keys `audio_path` (path to the audio file, relative to `UPLOAD_DIR`; paths outside it are rejected with 400) and `output_filename` (desired filename for the generated audio response).
      - Response: JSON object with the keys `transcription` (transcribed text), `response_text` (generated response), and `audio_output` (path to the generated audio file).
      - Example cURL command:
        ```
