@@ -107,6 +107,8 @@ def add_pdfs_to_vectorstore(files):
 
 
 def answer_query(message):
+    if 'qdrant' not in globals():
+        raise RuntimeError('No PDFs uploaded yet; call /upload_pdfs first')
     # Perform a similarity search on the vectorstore to find relevant context
     context_docs = qdrant.similarity_search(message, k=10)
     context = ' '.join(doc.page_content for doc in context_docs)
@@ -192,9 +194,6 @@ def process_audio():
         response_text = answer_query(transcription)
         audio_output_path = generate_and_play_audio(response_text, output_filename)
 
-        # Get the relative path of the audio output file
-        relative_audio_output_path = os.path.relpath(audio_output_path, os.getcwd())
-
         return jsonify({
             'transcription': transcription,
             'response_text': response_text,
@@ -203,8 +202,10 @@ def process_audio():
     except IOError:
         return jsonify({'error': 'Audio file not found'}), 404
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error: {e}")
+        return jsonify({'error': 'Internal error while processing audio'}), 500
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # debug=True exposes the Werkzeug debugger (remote code execution); opt in via FLASK_DEBUG=1
+    app.run(debug=os.environ.get('FLASK_DEBUG') == '1')
