@@ -2,6 +2,10 @@
 
 This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot that allows users to interact with a large language model (Mistral-7B) using voice input and receive voice responses. The chatbot retrieves relevant information from uploaded PDF documents to provide context-aware answers. Here’s a short video demonstrating the UI - https://www.youtube.com/watch?v=DAJgfzRsfBs
 
+![Notebook output from a real Colab run of RAG_Voice_Chatbot.ipynb: library versions, CUDA device and Gradio launch](docs/images/demo.png)
+
+*Captured output of the `RAG_Voice_Chatbot.ipynb` cells from a Colab GPU run (the app itself needs a GPU and a 7B model, so it was not re-run locally).*
+
 ## Features
 
 - Upload multiple PDF files to create a knowledge base
@@ -28,7 +32,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 1. Clone the repository:
 
    ```
-   git clone https://github.com/vardhanam/RAG_Voice_Chatbot.git
+   git clone https://github.com/moneebullah25/RAG_Voice_Chatbot.git
    ```
 
 2. Install the required dependencies:
@@ -36,6 +40,10 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
    ```
    pip install -r requirements.txt
    ```
+
+   Note: `requirements.txt` is a full Colab environment freeze (it includes CUDA-only wheels such as `cudf-cu12`), so it installs reliably only on a Colab-like Linux/CUDA machine.
+
+3. The Mistral model is gated on Hugging Face. Replace `YOUR_HF_TOKEN` in the notebook `login(...)` cell with your own token (never commit it).
 
 ## Usage
 
@@ -52,7 +60,7 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 1. Start the Flask server:
 
    ```
-   python flask_app.py
+   python flask_app.py          # set FLASK_DEBUG=1 to enable the debugger (local use only)
    ```
 
 2. The API provides the following endpoints:
@@ -102,6 +110,8 @@ This project demonstrates a Voice RAG (Retrieval-Augmented Generation) Chatbot t
 - `clear_btn`: Button component to clear all inputs and outputs.
 
 ## Notes
+
+- The Flask endpoints read arbitrary server-side file paths you send them; run the API only on localhost/trusted networks.
 
 - The chatbot uses the Mistral-7B language model, which requires significant computational resources. Ensure you have sufficient memory and a compatible GPU.
 - The chatbot relies on the uploaded PDF files for providing context-aware responses. Make sure to upload relevant documents before asking questions.
